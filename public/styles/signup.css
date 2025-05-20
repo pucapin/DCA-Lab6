@@ -1,0 +1,97 @@
+.back {
+  height: 100vh;
+  background: linear-gradient(135deg, #f9a8d4, #a78bfa);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Wrapper */
+.signup-wrapper {
+  width: 100%;
+  max-width: 500px;
+  padding: 2rem;
+}
+
+/* Card */
+.signup-card {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(16px);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  color: #fff;
+  animation: fadeIn 1s ease;
+}
+
+.signup-card h2 {
+  margin-bottom: 0.5rem;
+  font-size: 1.8rem;
+}
+
+.signup-card p {
+  margin-bottom: 1.5rem;
+  color: #fefefe;
+  opacity: 0.85;
+}
+
+/* Inputs */
+.signup-card input {
+  width: 90%;
+  padding: 0.8rem 1rem;
+  margin-bottom: 1rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  background: rgba(255, 255, 255, 0.8);
+  color: #333;
+  transition: 0.3s;
+}
+
+.signup-card input:focus {
+  outline: none;
+  background: #fff;
+  box-shadow: 0 0 0 2px #c084fc;
+}
+
+/* Button */
+.signup-card button {
+  width: 100%;
+  padding: 0.8rem;
+  background: linear-gradient(135deg, #f472b6, #c084fc);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.signup-card button:hover {
+  background: linear-gradient(135deg, #ec4899, #a855f7);
+}
+
+/* Links */
+.signup-card .links {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.signup-card .links a {
+  color: #fff;
+  text-decoration: none;
+  opacity: 0.8;
+  transition: 0.3s;
+}
+
+.signup-card .links a:hover {
+  opacity: 1;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
