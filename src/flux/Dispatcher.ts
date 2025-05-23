@@ -1,6 +1,12 @@
+import { UserCredential } from "firebase/auth";
+
+export type PathPayload = {
+    path: string;
+};
+
 export interface Action {
     type: string;
-    payload?: object | number | string;
+    payload?: PathPayload | UserCredential;
 }
 
 export class Dispatcher {

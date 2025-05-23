@@ -79,14 +79,16 @@
   font-size: 0.9rem;
 }
 
-.signup-card .links a {
+.signup-card .links p {
   color: #fff;
   text-decoration: none;
   opacity: 0.8;
   transition: 0.3s;
+  cursor: pointer;
+
 }
 
-.signup-card .links a:hover {
+.signup-card .links p:hover {
   opacity: 1;
 }
 

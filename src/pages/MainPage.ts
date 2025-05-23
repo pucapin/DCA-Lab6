@@ -1,12 +1,31 @@
+import { State, store } from "../flux/Store";
+import { getAuth } from "firebase/auth";
+import { fetchUserInfo } from "../Firebase/FetchUser";
+import { logoutUser } from "../Firebase/LogOutService";
 
+class MainPage extends HTMLElement {
+    private userName: string = '';
 
-class MainPage extends HTMLElement {    
-    connectedCallback() {
+    async connectedCallback() {
         this.attachShadow({ mode: 'open' });
+        store.subscribe((state: State) => {this.render(state)});
+
+        const auth = getAuth();
+        const currentUser = auth.currentUser;
+        if (!currentUser) return;
+
+        const userId = currentUser.uid;
+        const userInfo = await fetchUserInfo(userId);
+        this.userName = userInfo?.username || "User";
+
         this.render();
     }
 
-    render() {
+    render(state = store.getState()) {
+        if (!state || !state.isAuthenticated) {
+            this.shadowRoot!.innerHTML = `<h1>Acceso denegado</h1>`;
+            return;
+        }
         if (!this.shadowRoot) return;
 
         this.shadowRoot.innerHTML = `
@@ -49,96 +68,35 @@ class MainPage extends HTMLElement {
         cursor: pointer;
         }
 
-        .form-area {
-        display: flex;
-        align-items: flex-start;
-        gap: 1rem;
-        margin-top: 2rem;
-        }
-
-        .pencil-icon {
-        width: 70px;
-        height: auto;
-        }
-
-        .postit-form {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-        }
-
-        .postit-form input,
-        .postit-form textarea {
-        font-family: 'Poppins', sans-serif;
-        width: 90%;
-        padding: 0.75rem;
-        border: none;
-        border-radius: 8px;
-        font-size: 1rem;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        background: #fffbe7;
-        resize: none;
-        }
-
-        textarea {
-        height: 100px;
-        }
-
-        .add-button {
-        align-self: flex-start;
-        background: #f59e0b;
-        color: white;
-        width: 100px;
-        height: 32px;
-        border: none;
-        border-radius: 12px;
-        font-size: 1rem;
-        font-weight: bold;
-        cursor: pointer;
-        transition: background 0.3s;
-        }
-
-        .add-button:hover {
-        background: #d97706;
-        }
-
         </style>
         <div class="back">
+        <button id="logoutBtn" class="logout-button">Log Out</button>
+
         <div class="main-container" id="main">
             <header class="header">
-            <h1>Isabella's To Do List</h1>
+            <h1>${this.userName}'s To Do List</h1>
             <button class="add-task" id="openOverlay">+ Add New Task</button>
             </header>
-
-            <div class="task-board">
-            <div class="task-card">
-                <h3>Mock Task</h3>
-                <p>This is your first task. Make it happen!</p>
-            </div>
-        </div>
+            <firebase-comp></firebase-comp>
 
         <div class="overlay" id="overlay">
             <div class="overlay-content">
             <button class="go-back" id="closeOverlay">Go Back !</button>
-
-            <div class="form-area">
-                <div class="postit-form">
-                <input type="text" placeholder="Title" id="taskTitle" />
-                <textarea placeholder="Description" id="taskDescription"></textarea>
-                </div>
-                <img src="images/pencil.png" alt="Pencil" class="pencil-icon" />
-            </div>
-
-            <button class="add-button">Add</button>
+            <new-task></new-task>
             </div>
             </div>
         </div>
         `;
+
+        const logOut = this.shadowRoot.getElementById("logoutBtn");
         const overlay = this.shadowRoot.getElementById("overlay");
         const main = this.shadowRoot.getElementById("main");
         const newTask = this.shadowRoot.getElementById("openOverlay")
         const closeOverlay = this.shadowRoot.getElementById("closeOverlay");
+
+        logOut?.addEventListener('click', () => {
+            logoutUser();
+        })
 
         newTask?.addEventListener('click', () => {
             if(!overlay) return;
@@ -149,6 +107,11 @@ class MainPage extends HTMLElement {
         closeOverlay?.addEventListener('click', () => {
             if(!overlay) return;
             if(!main) return;
+            overlay.style.display = "none";
+        })
+
+        this.addEventListener('task-added', () => {
+            if(!overlay) return;
             overlay.style.display = "none";
         })
 

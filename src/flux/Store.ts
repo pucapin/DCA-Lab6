@@ -1,14 +1,12 @@
+import { User, UserCredential } from 'firebase/auth';
+import { NavigateActionsType, UserActionsType } from './Actions';
 import { AppDispatcher, Action } from './Dispatcher';
-import { CounterActionTypes, UserActionTypes } from './Actions';
-
-export type User = {
-    name: string;
-    age: number;
-}
+import { auth } from '../Firebase/FirebaseConfig';
 
 export type State = {
-    count: number;
-    user: User | null;
+    currentPath: string;
+    isAuthenticated: boolean;
+    userAuthenticated: UserCredential | User | null;
 };
 
 type Listener = (state: State) => void;
@@ -16,14 +14,14 @@ type Listener = (state: State) => void;
 
 class Store {
     private _myState: State = {
-        count: 0,
-        user: null,
+        currentPath: '',
+        isAuthenticated: false,
+        userAuthenticated: null
     }
-    // Los componentes
     private _listeners: Listener[] = [];
 
     constructor() {
-        AppDispatcher.register(this._handleActions.bind(this)); // Bind the context of this method to the Store instance
+        AppDispatcher.register(this._handleActions.bind(this));
     }
 
     getState() {
@@ -32,36 +30,56 @@ class Store {
 
     _handleActions(action: Action): void {
         switch (action.type) {
-            case CounterActionTypes.INCREMENT_COUNT:
-                if (typeof action.payload === 'number') {
+            case NavigateActionsType.NAVIGATE:
+                if (action.payload && 'path' in action.payload) {
                     this._myState = {
                         ...this._myState,
-                        count: this._myState.count + action.payload,
+                        currentPath: action.payload.path 
                     }
+                    this._emitChange();
                 }
-                this._emitChange();
                 break;
-
-            case CounterActionTypes.DECREMENT_COUNT:
-                if (typeof action.payload === 'number') {
-                    this._myState = {
-                        ...this._myState,
-                        count: this._myState.count - action.payload,
-                    }
+            case UserActionsType.SAVE_USER:
+                this._myState = {
+                    ...this._myState,
+                    isAuthenticated: true,
+                    userAuthenticated: action.payload as UserCredential
                 }
                 this._emitChange();
+
                 break;
-
-            case UserActionTypes.SAVE_USER:
-                if (typeof action.payload === 'object') {
-                    this._myState = {
-                        ...this._myState,
-                        user: action.payload as User,
+            case UserActionsType.CHECK_AUTH:
+                auth.onAuthStateChanged((user) => {
+                    if (user) {
+                        this._myState = {
+                            ...this._myState,
+                            isAuthenticated: true,
+                            userAuthenticated: user,
+                        }
+                    } else {
+                        this._myState = {
+                            ...this._myState,
+                            isAuthenticated: false,
+                            userAuthenticated: null
+                        }
                     }
-                }
-                this._emitChange();
+                    this._emitChange();
+                });
+                break;
+            case UserActionsType.LOGOUT:
+                auth.signOut().then(() => {
+                    this._myState = {
+                        currentPath: '/',
+                        isAuthenticated: false,
+                        userAuthenticated: null
+                    }
+                    this._emitChange();
+                }).catch((error) => {
+                    console.error('Error al cerrar sesión:', error);
+                });
                 break;
         }
+
     }
 
     private _emitChange(): void {
@@ -71,16 +89,15 @@ class Store {
         }
     }
 
-    // Permite a los componentes suscribirse al store
     subscribe(listener: Listener): void {
         this._listeners.push(listener);
-        listener(this.getState()); // Emitir estado actual al suscribirse
+        listener(this.getState()); 
     }
 
-    // Permite quitar la suscripción
     unsubscribe(listener: Listener): void {
         this._listeners = this._listeners.filter(l => l !== listener);
     }
+
 
 }
 

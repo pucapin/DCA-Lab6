@@ -83,14 +83,15 @@
   font-size: 16px;
 }
 
-.login-card .links a {
+.login-card .links p {
   color: #fff;
   text-decoration: none;
   opacity: 0.8;
   transition: 0.3s;
+  cursor: pointer;
 }
 
-.login-card .links a:hover {
+.login-card .links p:hover {
   opacity: 1;
 }
 

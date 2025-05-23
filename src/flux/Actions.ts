@@ -1,34 +1,43 @@
 import { AppDispatcher } from './Dispatcher';
+import { UserCredential } from "firebase/auth";
 
-export const CounterActionTypes = {
-    INCREMENT_COUNT: 'INCREMENT_COUNT',
-    DECREMENT_COUNT: 'DECREMENT_COUNT'
+
+export const NavigateActionsType = {
+    NAVIGATE: 'NAVIGATE'
 };
 
-export const UserActionTypes = {
+export const UserActionsType = {
     SAVE_USER: 'SAVE_USER',
+    CHECK_AUTH: 'CHECK_AUTH',
+    LOGOUT: 'LOGOUT'
+}
+
+
+export const NavigateActions = {
+    navigate: (path: string) => {
+        AppDispatcher.dispatch({
+            type: NavigateActionsType.NAVIGATE,
+            payload: { path }
+        });
+    }
 };
 
-export const CounterActions = {
-    increment: (value: number) => {
-        AppDispatcher.dispatch({
-            type: CounterActionTypes.INCREMENT_COUNT,
-            payload: value,
-        });
-    },
-    decrement: (value: number) => {
-        AppDispatcher.dispatch({
-            type: CounterActionTypes.DECREMENT_COUNT,
-            payload: value,
-        });
-    },
-};
 
 export const UserActions = {
-    saveUser: (user: { name: string; age: number }) => {
+    saveUser: (user: UserCredential) => {
         AppDispatcher.dispatch({
-            type: UserActionTypes.SAVE_USER,
-            payload: user,
+            type: UserActionsType.SAVE_USER,
+            payload: user
         });
     },
+    checkAuth: () => {
+        AppDispatcher.dispatch({
+            type: UserActionsType.CHECK_AUTH
+        });
+    },
+    logout: () => {
+        AppDispatcher.dispatch({
+            type: UserActionsType.LOGOUT
+        });
+    }
 };
